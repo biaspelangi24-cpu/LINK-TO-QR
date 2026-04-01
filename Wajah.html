@@ -1,0 +1,1239 @@
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+<meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">  
+<link rel="icon" href="gambar/a.png">
+<link rel="apple-touch-icon" href="gambar/a.png">
+<title>minemo</title>  
+<style>  
+
+  body {
+  margin: 0;
+  background: black;
+  min-height: 100dvh;
+  overflow: hidden;
+}
+@media (max-width: 480px) {
+  #entity {
+    transform: scale(0.85);
+  }
+}
+
+#sound-sidebar {
+  position: fixed;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 100;
+  background: rgba(0,0,0,0.8);
+  padding: 20px 10px;
+  border-radius: 20px;
+  border: 2px solid cyan;
+  box-shadow: 0 0 20px cyan;
+}
+
+.sound-btn {
+  background: rgba(0,255,255,0.2);
+  border: 2px solid cyan;
+  color: cyan;
+  padding: 12px 20px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+  will-change: transform, box-shadow;
+  touch-action: manipulation;
+  pointer-events: auto;
+}
+
+.sound-btn:active {
+  transform: scale(0.92) translateY(3px) rotate(1deg);
+  box-shadow: 0 8px 25px rgba(0,255,255,0.6);
+  animation: clickShake 0.15s ease-in-out;
+}
+
+.sound-btn::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: radial-gradient(circle, rgba(0,255,255,0.6) 0%, rgba(0,255,255,0.2) 70%, transparent 100%);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.sound-btn:active::after {
+  width: 300%;
+  height: 300%;
+}
+
+.sound-btn:hover {
+  background: rgba(0,255,255,0.8);
+  color: black;
+  box-shadow: 0 0 25px cyan;
+  transform: scale(1.08);
+}
+
+@media (max-width: 480px) {
+  #sound-sidebar {
+    flex-direction: row;
+    top: auto;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    flex-wrap: wrap;
+    max-width: 90vw;
+    gap: 8px;
+    padding: 15px;
+  }
+}
+
+@media (max-height: 500px) {
+  #entity {
+    transform: scale(0.75) !important;
+  }
+  #hands {
+    bottom: env(safe-area-inset-bottom, 1svh);
+  }
+  .hand {
+    bottom: clamp(1svh, 2svh, 4svh);
+  }
+}
+  
+#entity {  
+  position: relative;  
+  width: min(320px, 80vw);
+  height: min(200px, 25vw);  
+  pointer-events: auto;
+  transform:scale(clamp(0.8, 1vw, 1));
+}  
+.eye-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden; 
+}
+  
+.eye {
+  width: 70px;
+  height: 70px;
+  border: 4px solid cyan;
+  position: absolute;
+  top: 30px;
+  overflow: visible; 
+  transition: box-shadow 0.5s, border-color 0.5s;
+}
+  
+.eye.left { left: 40px; }  
+.eye.right { right: 40px; }  
+  
+.eye.sad {  
+  border-color: deepskyblue;  
+  box-shadow: 0 0 15px deepskyblue;  
+}  
+  
+.pupil {  
+  width: 20px;  
+  height: 55px;  
+  background: cyan;  
+  position: absolute;  
+  left: 25px;  
+  top: 7px;   
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}  
+  
+.eyelid {  
+  position: absolute;  
+  width: 100%;  
+  height: 100%;  
+  background: white;  
+  top: -100%;  
+  left: 0;  
+  transition: top 0.3s;  
+  z-index: 5;  
+}  
+  
+.tear {
+  position: absolute;
+  width: 6px;
+  height: 16px;
+  background: deepskyblue;
+  left: 32px;
+  top: 65px; 
+  border-radius: 3px;
+  opacity: 0;
+  z-index: 3;
+}
+
+.cry .tear {
+  animation: tearFall 1.2s linear infinite;
+  opacity: 1;
+}
+
+@keyframes tearFall {
+  0%   { transform: translateY(0); opacity: 0; }
+  10%  { opacity: 1; }
+  100% { transform: translateY(60px); opacity: 0; }
+}
+#mouth {
+  position: absolute;
+  top: 115px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 26px;
+  background: white;
+  border-radius: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.mouth-line {
+  width: 32px;
+  height: 4px;
+  background: black;
+  border-radius: 5px;
+  transition: all 0.4s ease;
+}
+.mouth-happy .mouth-line {
+  border-radius: 0 0 20px 20px;
+  height: 6px;
+  transform: translateY(-2px);
+}
+
+.mouth-sad .mouth-line {
+  border-radius: 5px;
+}
+.mouth-yawn .mouth-line {
+  width: 22px;
+  height: 20px;
+  border-radius: 50%;
+  animation: yawn 1.6s ease-in-out;
+}
+
+@keyframes yawn {
+  0%   { height: 4px; width: 32px; }
+  40%  { height: 22px; width: 26px; }
+  100% { height: 4px; width: 32px; }
+}
+.eye.tired {
+  border-color: #88aaff;
+  box-shadow: 0 0 10px #4466ff;
+}
+.eye.tired .pupil {
+  transform: translateY(10px) !important;
+}
+
+.eye.tired .eyelid {
+  top: -50%;
+}
+.mouth-tired .mouth-line {
+  width: 26px;
+  height: 4px;
+  opacity: 0.6;
+}
+.touch-ring {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: 2px solid cyan;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: ripple 0.6s ease-out forwards;
+  z-index: 10;
+}
+
+@keyframes ripple {
+  from {
+    transform: scale(0.2);
+    opacity: 1;
+  }
+  to {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
+.eye.touch-glow {
+  box-shadow: 0 0 25px cyan;
+}
+#lamp {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  pointer-events: auto;
+  touch-action: manipulation;
+}
+
+#lamp-rope {
+  width: 4px;
+  height: 120px;
+  background: linear-gradient(to bottom, #666, #999);
+  margin: auto;
+  transition: transform 0.3s ease;
+}
+
+#lamp.pulled #lamp-rope {
+  transform: scaleY(1.15) rotate(-5deg);
+  animation: ropeShake 0.6s ease-out;
+}
+
+#lamp.pulled #lamp-bulb {
+  animation: bulbSwing 0.6s ease-out;
+  box-shadow: 0 0 15px #ffaa00;
+}
+
+#lamp-bulb {
+  width: 20px;
+  height: 20px;
+  background: #555;
+  border-radius: 50%;
+  cursor: pointer;
+}
+#light-glow {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at top,
+    rgba(255,255,200,0.6),
+    rgba(0,0,0,0.9)
+  );
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s;
+  z-index: 5;
+}
+
+.light-on #light-glow {
+  opacity: 1;
+}
+
+.eye.angry {
+  border-color: red !important;
+  box-shadow: 0 0 15px red;
+}
+
+.mouth-angry .mouth-line {
+  transform: rotate(180deg);
+  border-radius: 20px 20px 0 0;
+}
+.sleep .eyelid {
+  top: 0 !important;
+}
+
+.sleep .pupil {
+  opacity: 0;
+}
+.sleep .tear {
+  opacity: 0 !important;
+  animation: none !important;
+}
+#zzz {
+  position: absolute;
+  top: -25px;             
+  left: 50%;
+  transform: translateX(-50%) rotate(-20deg);
+  color: white;
+  font-size: 18px;
+  letter-spacing: 4px;
+  opacity: 0;
+  pointer-events: none;
+}
+.sleeping #zzz {
+  opacity: 1;
+  animation: zzzMove 2.5s infinite;
+}
+@keyframes zzzMove {
+  0% {
+    transform: translate(-50%, 0) rotate(-20deg);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-30%, -40px) rotate(-20deg);
+    opacity: 0;
+  }
+}
+#dark-frame {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.75);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+  z-index: 4;
+}
+
+@keyframes clickShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-2px); }
+  75% { transform: translateX(2px); }
+}
+
+@keyframes ropeShake {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  25% { transform: translateX(-1px) rotate(-3deg); }
+  50% { transform: translateX(2px) rotate(4deg); }
+  75% { transform: translateX(-1px) rotate(-2deg); }
+}
+
+@keyframes bulbSwing {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-2px) rotate(-4deg); }
+  50% { transform: translateY(1px) rotate(5deg); }
+  75% { transform: translateY(-1px) rotate(-3deg); }
+}
+
+@keyframes snoreBreath {
+  0% {
+    width: 18px;
+    height: 4px;
+    border-radius: 10px;
+  }
+  30% {
+    width: 32px;
+    height: 16px;
+    border-radius: 50%;
+  }
+  60% {
+    width: 26px;
+    height: 10px;
+    border-radius: 40%;
+  }
+  100% {
+    width: 18px;
+    height: 4px;
+    border-radius: 10px;
+  }
+}
+
+
+
+.dark-on #dark-frame {
+  opacity: 1;
+}
+
+.mouth-snore .mouth-line {
+  animation: snoreBreath 4s ease-in-out infinite;
+}
+#center-screen {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+}
+#hands {
+  position: fixed;
+  left: 0;
+  bottom: env(safe-area-inset-bottom);
+  width: 100%;
+  height: 0;
+  pointer-events: none;
+  z-index: 70;
+}
+
+.hand {
+  position: absolute;
+  bottom: clamp(2svh, 4svh, 6svh);
+  width: clamp(70px, 15vw, 120px);
+  pointer-events: auto;
+  touch-action: none;
+  transform: translate(0, 0);
+}
+
+.hand.left { left: 18%; }
+.hand.right { right: 18%; }
+
+.hand img {
+  width: 100%;
+  display: block;
+  position: relative;
+  z-index: 2;
+}
+
+.hand.release {
+  transition: transform 0.7s cubic-bezier(0.25,1.6,0.5,1);
+}
+.hand.wave {
+  animation: waveHand 1.2s ease-in-out 3;
+}
+
+@keyframes waveHand {
+  0%   { transform: translateY(0) rotate(0deg); }
+  25%  { transform: translateY(-12px) rotate(12deg); }
+  50%  { transform: translateY(-12px) rotate(-12deg); }
+  75%  { transform: translateY(-12px) rotate(12deg); }
+  100% { transform: translateY(0) rotate(0deg); }
+}
+
+.mouth-talk .mouth-line {
+  animation: talk 0.25s infinite alternate;
+}
+
+@keyframes talk {
+  from { height: 4px; width: 22px; }
+  to   { height: 14px; width: 26px; border-radius: 50%; }
+}
+
+#intro-text {
+  position: fixed;
+  top: 30%;
+  left: 50%;
+  transform: translateX(-50%);
+  color: cyan;
+  font-size: clamp(18px, 5vw, 28px);
+  opacity: 0;
+  transition: opacity 0.5s;
+  pointer-events: none;
+  z-index: 100;
+}
+#intro-text.show {
+  opacity: 1;
+}
+.ad-banner {
+    position: fixed;
+    top: 10px;           
+    left: 50%;
+    transform: translateX(-50%);
+    background: #222;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 10px;
+    cursor: pointer;
+    z-index: 9999;
+    pointer-events: auto;
+}
+.toast {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); 
+    
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 15px 25px;
+    border-radius: 10px;
+    font-size: 18px;
+
+    opacity: 0;
+    transition: 0.3s ease;
+}
+.toast.show {
+    opacity: 1;
+}
+</style>  
+</head>  
+<body>
+<div id="dark-frame"></div>
+<div id="light-glow"></div>
+<div id="center-screen">
+<div id="intro-text">Hai Welcome</div>
+<div id="sound-sidebar">
+  <button class="sound-btn" onclick="playSound('sound/Ha.mp3')">sound 1</button>
+  <button class="sound-btn" onclick="playSound('sound/as.mp3')">even Lebaran</button>
+  <button class="sound-btn" onclick="playSound('laugh')"></button>
+  <button class="sound-btn" onclick="playSound('angry')"></button>
+  <button class="sound-btn" onclick="playSound('sleep')"></button>
+</div>
+
+<div id="entity">
+ 
+  <!-- MULUT -->
+<div id="mouth">
+  <div class="mouth-line"></div>
+</div>
+<div id="zzz">
+  Z&nbsp;Z&nbsp;Z
+</div>
+  <div class="eye left" id="eyeLeft">
+  <div class="eye-inner">
+    <div class="eyelid"></div>
+    <div class="pupil"></div>
+  </div>
+  <div class="tear"></div>
+</div>
+
+<div class="eye right" id="eyeRight">
+  <div class="eye-inner">
+    <div class="eyelid"></div>
+    <div class="pupil"></div>
+  </div>
+  <div class="tear"></div>
+</div>
+</div>
+</div>
+<div id="lamp">
+  <div id="lamp-rope"></div>
+  <div id="lamp-bulb"></div>
+</div>
+<div id="hands">
+  <div class="hand left" data-side="left">
+    <img src="Tangan2.png">
+  </div>
+
+  <div class="hand right" data-side="right">
+    <img src="Tangan1.png" />
+  </div>
+</div>
+<a id="ad-banner" class="ad-banner" href="#">
+  💰 Kirim THR Lewat Dana 😊 
+</a>
+
+<div id="toast" class="toast"></div>
+  <script>  
+
+let eyeTimer = null;
+
+  const baseLength = 160;
+  let forcedSleep = false;
+  let sleepMode = false;
+let snoreInterval = null;  
+let lastAction = Date.now();
+let lastMove = Date.now();
+document.addEventListener("mousemove", track);  
+document.addEventListener("touchmove", e => track(e.touches[0]));  
+function track(e) {
+  lastMove = Date.now();   
+  lastAction = Date.now();
+  movePupil("eyeLeft", e, 8);
+  movePupil("eyeRight", e, 12);
+}
+  
+function movePupil(id, e, range) {  
+  const eye = document.getElementById(id);  
+  const pupil = eye.querySelector(".pupil");  
+  const rect = eye.getBoundingClientRect();  
+  
+  let x = (e.clientX - rect.left - rect.width / 2) / 8;  
+  let y = (e.clientY - rect.top - rect.height / 2) / 8;  
+  
+  x = Math.max(-range, Math.min(range, x));  
+  y = Math.max(-range, Math.min(range, y));  
+  
+  pupil.style.transform = `translate(${x}px, ${y}px)`;  
+}  
+  
+let stage = 0;  
+  
+function resetIdle() {  
+  lastAction = Date.now();  
+  stage = 0;  
+  ["eyeLeft","eyeRight"].forEach(id => {  
+    const eye = document.getElementById(id);  
+    eye.classList.remove("sad","cry");  
+  });  
+}  
+setInterval(() => {
+  const idle = Date.now() - lastAction;
+
+  if (idle > 18000 && idle < 25000) {
+    mouth.classList.add("mouth-tired");}
+    else{
+      mouth.classList.remove("mouth-tired");
+    } 
+}, 1000);
+    
+document.body.addEventListener("click", e => {  
+  if (!e.target.closest(".eye")) resetIdle();  
+});  
+  
+setInterval(() => {  
+  const idle = Date.now() - lastAction;  
+  
+  if (idle > 15000 && stage < 1) {  
+    stage = 1;  
+    ["eyeLeft","eyeRight"].forEach(id =>  
+      document.getElementById(id).classList.add("sad")  
+    );  
+  }  
+  
+  if (idle > 22000 && stage < 2) {  
+    stage = 2;  
+    document.getElementById("eyeLeft").classList.add("cry");  
+  }  
+  
+  if (idle > 25000 && stage < 3) {  
+    stage = 3;  
+    document.getElementById("eyeRight").classList.add("cry");  
+  }  
+}, 500);  
+  
+/* =============================  
+   BERKEDIP  
+============================= */  
+setInterval(() => {  
+  blink("eyeLeft");  
+  blink("eyeRight");  
+}, 4000);  
+  
+function blink(id) {  
+  const lid = document.getElementById(id).querySelector(".eyelid");  
+  lid.style.top = "0";  
+  setTimeout(() => lid.style.top = "-100%", 200);  
+}  
+  
+let eyeDisturbCount = 0;
+let disturbTimeout;
+["eyeLeft","eyeRight"].forEach(id => {  
+  document.getElementById(id).addEventListener("click", e => {  
+    e.stopPropagation();  
+    const lid = document.getElementById(id).querySelector(".eyelid");  
+    lid.style.top = "0";  
+    setTimeout(() => lid.style.top = "-100%", 600);  
+
+    eyeDisturbCount++;
+    clearTimeout(disturbTimeout);
+    disturbTimeout = setTimeout(() => eyeDisturbCount = 0, 2000);
+    if (sleepMode && eyeDisturbCount >= 3) {
+      triggerLampWake();
+    }
+  });  
+}); 
+const mouth = document.getElementById("mouth");
+/* =============================
+    MULUT
+============================= */
+let interactionCount = 0;
+let lastInteraction = Date.now();
+let yawnTimer = null;
+let isSoundPlaying = false;
+
+function setMouth(mode) {
+  mouth.className = "";
+  mouth.classList.add(`mouth-${mode}`);
+}
+
+function registerInteraction() {
+  interactionCount++;
+  lastInteraction = Date.now();
+  if (!isSoundPlaying) {
+    setMouth("happy");
+  }
+
+  if (!yawnTimer) {
+    startYawnCycle();
+  }
+}
+
+function startYawnCycle() {
+  yawnTimer = setInterval(() => {
+    if (Date.now() - lastInteraction > 12000 && interactionCount > 3 && !isSoundPlaying) {
+      setMouth("yawn");
+
+      setTimeout(() => {
+        if (!isSoundPlaying) {
+          setMouth("happy");
+        }
+      }, 1800);
+    }
+  }, 12000);
+}
+
+setInterval(() => {
+  if (Date.now() - lastInteraction > 15000 && !isSoundPlaying) {
+    setMouth("sad");
+  }
+}, 1000);
+
+document.addEventListener("mousemove", registerInteraction);
+document.addEventListener("touchstart", registerInteraction);
+document.addEventListener("click", registerInteraction);
+setInterval(() => {
+  if (Date.now() - lastMove > 4000) {
+    centerEye("eyeLeft");
+    centerEye("eyeRight");
+  }
+}, 300);
+
+function centerEye(id) {
+  const pupil = document
+    .getElementById(id)
+    .querySelector(".pupil");
+  pupil.style.transform = "translate(0, 0)";
+}
+/* =============================
+   EFEK SENTUH 
+============================= */
+["eyeLeft", "eyeRight"].forEach(id => {
+  const eye = document.getElementById(id);
+
+  function touchEffect(x, y) {
+    const ring = document.createElement("div");
+    ring.className = "touch-ring";
+
+    const rect = eye.getBoundingClientRect();
+    ring.style.left = (x - rect.left - 10) + "px";
+    ring.style.top  = (y - rect.top - 10) + "px";
+
+    eye.appendChild(ring);
+
+    eye.classList.add("touch-glow");
+
+    setTimeout(() => {
+      ring.remove();
+      eye.classList.remove("touch-glow");
+    }, 600);
+  }
+
+
+  eye.addEventListener("mousedown", e => {
+    touchEffect(e.clientX, e.clientY);
+  });
+
+  eye.addEventListener("touchstart", e => {
+    const t = e.touches[0];
+    touchEffect(t.clientX, t.clientY);
+  });
+});
+let lampOn = false;
+let pullCount = 0;
+
+const bulb = document.getElementById("lamp-bulb");
+const body = document.body;
+
+bulb.addEventListener("click", () => {
+  const lamp = document.getElementById('lamp');
+  lamp.classList.add('pulled');
+  setTimeout(() => lamp.classList.remove('pulled'), 600);
+  
+  pullCount++;
+lampOn = !lampOn;
+
+if (lampOn) {
+  body.classList.add("light-on");
+  body.classList.remove("dark-on");
+  wakeUp();
+} else {
+  body.classList.remove("light-on");
+  body.classList.add("dark-on");
+  startSleep();
+}
+
+  if (pullCount >= 5) {
+    angryMode();
+  }
+});
+
+function angryMode() {
+  ["eyeLeft","eyeRight"].forEach(id =>
+    document.getElementById(id).classList.add("angry")
+  );
+  document.getElementById("mouth").classList.add("mouth-angry");
+
+  setTimeout(() => {
+    ["eyeLeft","eyeRight"].forEach(id =>
+      document.getElementById(id).classList.remove("angry")
+    );
+    document.getElementById("mouth").classList.remove("mouth-angry");
+    pullCount = 0;
+  }, 4000);
+}
+
+function startSleep(force = false){
+  if (sleepMode && !force) return;   
+  stage = 0;
+  ["eyeLeft", "eyeRight"].forEach(id => {
+    const eye = document.getElementById(id);
+    eye.classList.remove("sad", "cry", "tired");
+  });
+  sleepMode = true;
+  forcedSleep = force;
+  setMouth("yawn");
+
+
+  setTimeout(() => {
+  ["eyeLeft", "eyeRight"].forEach(id => {
+    document.getElementById(id).classList.add("sleep");
+  });
+
+  document.body.classList.add("sleeping");
+
+  if (!snoreInterval) {
+    snoreInterval = setInterval(() => {
+      if (!sleepMode) return;
+
+      mouth.className = "";
+      mouth.classList.add("mouth-snore");
+
+      setTimeout(() => {
+        if (sleepMode) {
+          setMouth("sad"); 
+        }
+      }, 4000);
+
+    }, 4500);
+  }
+
+}, 1800);
+}
+
+function wakeUp() {
+  if (document.body.classList.contains("dark-on")) {
+    startSleep(true);
+    return;
+  }
+
+  forcedSleep = false;
+  sleepMode = false;
+
+  if (snoreInterval) {
+    clearInterval(snoreInterval);
+    snoreInterval = null;
+  }
+
+  ["eyeLeft","eyeRight"].forEach(id => {
+    document.getElementById(id).classList.remove("sleep");
+  });
+
+  document.body.classList.remove("sleeping");
+  setMouth("happy");
+}
+let wasDark = false;
+
+setInterval(() => {
+  const isDark = document.body.classList.contains("dark-on");
+
+  if (isDark && !sleepMode) {
+    startSleep(true);
+  }
+
+  if (!isDark && sleepMode && forcedSleep) {
+    wakeUp();
+  }
+},600);
+
+function closeEyesForMoment() {
+  if (eyeTimer) return;
+
+  ["eyeLeft", "eyeRight"].forEach(id => {
+    document.getElementById(id).classList.add("sleep");
+  });
+
+  setMouth("happy");
+
+  eyeTimer = setTimeout(() => {
+    ["eyeLeft", "eyeRight"].forEach(id => {
+      document.getElementById(id).classList.remove("sleep");
+    });
+
+    mouth.className = "";
+    mouth.classList.add("mouth-happy");
+
+    eyeTimer = null;
+  }, 3000);
+}
+
+document.querySelectorAll(".hand").forEach(hand => {
+  const baseLength = 220;
+  let startX = 0, startY = 0;
+  let dx = 0, dy = 0;
+  let dragging = false;
+
+
+  hand.addEventListener("touchstart", e => {
+    const t = e.touches[0];
+    startX = t.clientX;
+    startY = t.clientY;
+    dragging = true;
+    hand.classList.remove("release");
+  });
+
+  hand.addEventListener("touchmove", e => {
+    if (!dragging) return;
+    const t = e.touches[0];
+
+    dx = t.clientX - startX;
+    dy = t.clientY - startY;
+    if (dy > 0) dy = 0;
+    const max = 220;
+    const dist = Math.hypot(dx, dy);
+    if (dist > max) {
+      const r = max / dist;
+      dx *= r;
+      dy *= r;
+    }
+
+    hand.style.transform =
+      `translate(${dx}px, ${dy}px)`;
+  updateRope();
+    if (Math.abs(dy)>30 && !isSoundPlaying) setMouth("happy");
+    if (sleepMode && Math.abs(dy) > 20) {
+      wakeUp();
+      angryMode();
+      pullCount++; 
+    }
+  });
+
+  hand.addEventListener("touchend", () => {
+    dragging = false;
+
+    hand.classList.add("release");
+    hand.style.transform = "translate(0,0)";
+    
+    const releaseAnim = () => {
+      updateRope();
+      if (hand.classList.contains('release')) {
+        requestAnimationFrame(releaseAnim);
+      }
+    };
+    releaseAnim();
+
+    dx = dy = 0;
+  });
+
+  hand.addEventListener("mousedown", (e) => {
+    e.preventDefault();
+    startX = e.clientX;
+    startY = e.clientY;
+    dragging = true;
+    hand.classList.remove("release");
+  });
+
+  document.addEventListener("mousemove", (e) => {
+    if (!dragging) return;
+    dx = e.clientX - startX;
+    dy = e.clientY - startY;
+    if (dy > 0) dy = 0;
+    const max = 220;
+    const dist = Math.hypot(dx, dy);
+    if (dist > max) {
+      const r = max / dist;
+      dx *= r;
+      dy *= r;
+    }
+    hand.style.transform = `translate(${dx}px, ${dy}px)`;
+    if (Math.abs(dy)>30 && !isSoundPlaying) setMouth("happy");
+    
+    if (sleepMode && Math.abs(dy) > 20) {
+      triggerLampWake();
+    }
+  });
+
+  document.addEventListener("mouseup", () => {
+    if (!dragging) return;
+    dragging = false;
+    hand.classList.add("release");
+    hand.style.transform = "translate(0,0)";
+    
+    const releaseAnim = () => {
+      updateRope();
+      if (hand.classList.contains('release')) {
+        requestAnimationFrame(releaseAnim);
+      }
+    };
+    releaseAnim();
+    
+    dx = dy = 0;
+  });
+});
+window.addEventListener("load", () => {
+  setTimeout(() => {
+    lampOn = true;
+    body.classList.add("light-on");
+    body.classList.remove("dark-on");
+    wakeUp();
+  }, 300);
+});
+
+document.addEventListener("click", (e) => {
+  const clickEffect = document.createElement("div");
+  clickEffect.className = "cursor-click";
+  clickEffect.style.left = e.clientX + "px";
+  clickEffect.style.top = e.clientY + "px";
+  
+  document.body.appendChild(clickEffect);
+  
+  setTimeout(() => {
+    clickEffect.remove();
+  }, 600);
+});
+window.addEventListener("load", () => {
+  const rightHand = document.querySelector('.hand.right');
+  const introText = document.getElementById("intro-text");
+
+  mouth.className = "";
+  mouth.classList.add("mouth-talk");
+
+  rightHand.classList.add("wave");
+
+  setTimeout(() => {
+    introText.classList.add("show");
+  }, 600);
+
+  setTimeout(() => {
+    rightHand.classList.remove("wave");
+    introText.classList.remove("show");
+    setMouth("happy");
+  }, 7600);
+});
+
+let aiEyeActive = true;
+let lastUserInteraction = Date.now();
+
+["mousemove", "touchstart", "touchmove"].forEach(evt => {
+  document.addEventListener(evt, () => {
+    lastUserInteraction = Date.now();
+    aiEyeActive = false;
+  });
+});
+
+setInterval(() => {
+  if (Date.now() - lastUserInteraction > 3000) {
+    aiEyeActive = true;
+  }
+}, 500);
+
+setInterval(() => {
+  if (!aiEyeActive) return;
+
+  moveAIEye("eyeLeft", 8);
+  moveAIEye("eyeRight", 10);
+}, 1800);
+
+function moveAIEye(id, range) {
+  const pupil = document
+    .getElementById(id)
+    .querySelector(".pupil");
+
+  const x = (Math.random() * 2 - 1) * range;
+  const y = (Math.random() * 2 - 1) * range * 0.6;
+
+  pupil.style.transform = `translate(${x}px, ${y}px)`;
+}
+
+const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+audioContext.resume(); 
+
+let audioCache = {}; 
+
+function playSound(type) {
+  if (sleepMode) wakeUp();
+  audioContext.resume();
+
+  let soundType = type.replace(/.*\//, ''); 
+  if (!audioCache[soundType]) {
+    audioCache[soundType] = new Audio(type);
+    audioCache[soundType].volume = 0.5;
+  }
+  const audio = audioCache[soundType];
+  
+  isSoundPlaying = true;
+  setMouth('talk');
+  
+  audio.play().then(() => {
+    audio.onended = () => {
+      isSoundPlaying = false;
+      setMouth(getFinalMouth(type));
+    };
+  }).catch(e => {
+    console.log('MP3 failed:', e);
+    isSoundPlaying = false;
+    playBeep(soundType.replace('.mp3', ''));
+  });
+}
+
+function playBeep(type) {
+  const freqs = {happy:523, sad:294, laugh:659, angry:196, sleep:130};
+  const freq = freqs[type] || 440;
+  const oscillator = audioContext.createOscillator();
+  const gainNode = audioContext.createGain();
+  oscillator.connect(gainNode);
+  gainNode.connect(audioContext.destination);
+  oscillator.frequency.value = freq;
+  oscillator.type = type === 'angry' ? 'square' : 'sine';
+  gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+  gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1);
+  oscillator.start(audioContext.currentTime);
+  oscillator.stop(audioContext.currentTime + 1);
+  
+  isSoundPlaying = true;
+  setMouth('talk');
+  oscillator.onended = () => {
+    isSoundPlaying = false;
+    setMouth(type || 'happy');
+  };
+}
+
+let isSleepingDisturbed = false;
+
+function triggerLampWake() {
+  if (isSleepingDisturbed || !sleepMode) return;
+  isSleepingDisturbed = true;
+  
+  const rightHand = document.querySelector('.hand.right');
+  rightHand.classList.remove('release');
+  rightHand.style.transition = 'all 0.8s cubic-bezier(0.25, 0.46, 0.47, 1.6)';
+  rightHand.style.left = 'calc(50% - 60px)';
+  rightHand.style.bottom = '60vh';
+  rightHand.style.transform = 'rotate(-15deg) scale(0.9)';
+  
+  setTimeout(() => {
+    const lamp = document.getElementById('lamp');
+    lamp.classList.add('pulled');
+    setTimeout(() => lamp.classList.remove('pulled'), 600);
+    
+    bulb.click();
+    angryMode();
+    
+    setTimeout(() => {
+      rightHand.style.transition = 'all 0.7s ease-out';
+      rightHand.style.right = '18%';
+      rightHand.style.left = '';
+      rightHand.style.bottom = '';
+      rightHand.style.transform = 'translate(0,0)';
+      rightHand.classList.add('release');
+      isSleepingDisturbed = false;
+      eyeDisturbCount = 0;
+    }, 500);
+  }, 700);
+}
+const banner = document.getElementById("ad-banner");
+const toast = document.getElementById("toast");
+
+const link = "https://link.dana.id/minta?full_url=https://qr.dana.id/v1/281012092026032591680017";
+
+banner.addEventListener("click", function(e) {
+    e.preventDefault(); 
+
+    showToastAndRedirect("Terima kasih 🙏, membuka DANA...");
+});
+
+function showToastAndRedirect(text) {
+    toast.innerText = text;
+    toast.classList.add("show");
+
+    setTimeout(() => {
+        toast.classList.remove("show");
+        window.location.assign(link);
+
+    }, 2000);
+}
+</script>
+</body>  
+</html>
